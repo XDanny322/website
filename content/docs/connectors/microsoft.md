@@ -209,3 +209,36 @@ connectors:
       # lowercase if config is TRUE
       emailToLowercase: true
 ```
+
+By default, dex resolves group ids to group names with a single request to
+the Microsoft Graph API. Microsoft Graph's
+[`directoryObjects/getByIds`](https://learn.microsoft.com/en-us/graph/api/directoryobject-getbyids)
+endpoint caps that request at 1000 ids, so a user who is a member of more
+than 1000 groups will fail to log in.
+
+Setting the `batchGroupLookups` (boolean) configuration option splits the
+lookup into batches of 1000 group ids, supporting users with larger group
+memberships. This is opt-in because it trades that login failure for
+additional requests to the Microsoft Graph API — one extra request per 1000
+groups a user belongs to — which may not be desirable for every deployment.
+
+```yaml
+connectors:
+  - type: microsoft
+    # Required field for connector id.
+    id: microsoft
+    # Required field for connector name.
+    name: Microsoft
+    config:
+      # Credentials can be string literals or pulled from the environment.
+      clientID: $MICROSOFT_APPLICATION_ID
+      clientSecret: $MICROSOFT_CLIENT_SECRET
+      redirectURI: http://127.0.0.1:5556/dex/callback
+      tenant: myorg.onmicrosoft.com
+      groups:
+        - developers
+        - devops
+      # Split group name lookups into batches of 1000 ids, supporting users
+      # in more than 1000 groups.
+      batchGroupLookups: true
+```
