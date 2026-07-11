@@ -156,7 +156,25 @@ By default (`groupNameFormat: name`), dex resolves group ids to group names.
 To keep group ids instead, set `groupNameFormat: id`. Name resolution uses a
 single Microsoft Graph request, which fails for users in more than 1000
 groups; set `batchGroupLookups: true` (boolean) to split the lookup into
-batches of 1000 ids instead.
+batches of 1000 ids instead:
+
+```yaml
+connectors:
+  - type: microsoft
+    # Required field for connector id.
+    id: microsoft
+    # Required field for connector name.
+    name: Microsoft
+    config:
+      # Credentials can be string literals or pulled from the environment.
+      clientID: $MICROSOFT_APPLICATION_ID
+      clientSecret: $MICROSOFT_CLIENT_SECRET
+      redirectURI: http://127.0.0.1:5556/dex/callback
+      tenant: myorg.onmicrosoft.com
+      # Split group name lookups into batches of 1000 ids, supporting users
+      # in more than 1000 groups.
+      batchGroupLookups: true
+```
 
 {{% alert title="Note" color="primary" %}}
 Resolving names for large group counts can produce a large JWT. If an
